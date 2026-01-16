@@ -32,6 +32,9 @@
             display: flex;
             flex-direction: column;
             box-shadow: 3px 0 15px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
         }
         
         /* Sidebar Logo - Fancy Style from Homepage */
@@ -120,6 +123,7 @@
             transition: all 0.3s;
             border-left: 4px solid transparent;
             font-size: 16px;
+            cursor: pointer;
         }
         
         .nav-item:hover, .nav-item.active {
@@ -173,6 +177,8 @@
             padding: 30px;
             overflow-y: auto;
             width: calc(100% - 280px);
+            margin-left: 280px;
+            transition: all 0.3s;
         }
         
         /* Top Header - White Area with Fancy Caterix Logo */
@@ -192,6 +198,7 @@
             display: flex;
             align-items: center;
             text-decoration: none;
+            cursor: pointer;
         }
         
         .white-logo {
@@ -566,6 +573,42 @@
             background-color: #1b5e20;
         }
         
+        /* Loading Indicator */
+        .loading-indicator {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #2e7d32;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Menu Manager Container */
+        #menuManagerContainer {
+            display: none;
+            width: 100%;
+        }
+        
         /* Responsive Design */
         @media (max-width: 1200px) {
             .dashboard-content {
@@ -580,6 +623,7 @@
             
             .main-content {
                 width: calc(100% - 240px);
+                margin-left: 240px;
             }
         }
         
@@ -591,6 +635,8 @@
             .sidebar {
                 width: 100%;
                 padding: 15px 0;
+                height: auto;
+                position: relative;
             }
             
             .logo-container {
@@ -646,6 +692,7 @@
             .main-content {
                 width: 100%;
                 padding: 20px;
+                margin-left: 0;
             }
             
             .top-header {
@@ -744,7 +791,7 @@
                 <i class="fas fa-calendar-alt"></i>
                 <span>Bookings</span>
             </a>
-            <a href="#" class="nav-item" data-page="menu">
+            <a href="#" class="nav-item" data-page="menu" id="menuItemsLink">
                 <i class="fas fa-utensils"></i>
                 <span>Menu Items</span>
             </a>
@@ -776,7 +823,7 @@
         <!-- Top Header - White Area with Fancy Caterix Logo -->
         <div class="top-header">
             <!-- White Area Logo - Same Fancy Style -->
-            <a href="#" class="white-logo-container">
+            <a href="#" class="white-logo-container" id="goToDashboard">
                 <div class="white-logo">
                     <div class="white-logo-icons">
                         <i class="fas fa-utensils"></i>
@@ -800,154 +847,166 @@
             </div>
         </div>
         
-        <!-- Dashboard Title -->
-        <div class="dashboard-title">
-            <h2>Catering Dashboard</h2>
-        </div>
-        
-        <!-- Stats Cards -->
-        <div class="stats-cards">
-            <div class="stat-card">
-                <div class="stat-info">
-                    <h3 id="total-orders">142</h3>
-                    <p>Total Orders</p>
+        <!-- Dashboard Content (Default View) -->
+        <div id="dashboardContent">
+            <!-- Dashboard Title -->
+            <div class="dashboard-title">
+                <h2>Catering Dashboard</h2>
+            </div>
+            
+            <!-- Stats Cards -->
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3 id="total-orders">142</h3>
+                        <p>Total Orders</p>
+                    </div>
+                    <div class="stat-icon orders-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
                 </div>
-                <div class="stat-icon orders-icon">
-                    <i class="fas fa-clipboard-list"></i>
+                
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3 id="monthly-revenue">$12,580</h3>
+                        <p>Revenue This Month</p>
+                    </div>
+                    <div class="stat-icon revenue-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3 id="active-customers">89</h3>
+                        <p>Active Customers</p>
+                    </div>
+                    <div class="stat-icon customers-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3 id="pending-orders">8</h3>
+                        <p>Pending Orders</p>
+                    </div>
+                    <div class="stat-icon pending-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
                 </div>
             </div>
             
-            <div class="stat-card">
-                <div class="stat-info">
-                    <h3 id="monthly-revenue">$12,580</h3>
-                    <p>Revenue This Month</p>
+            <!-- Charts and Recent Orders -->
+            <div class="dashboard-content">
+                <div class="chart-container">
+                    <div class="section-header">
+                        <h3>Revenue Overview</h3>
+                        <a href="#" class="view-all">View Details</a>
+                    </div>
+                    <div class="chart-placeholder">
+                        <div style="text-align: center;">
+                            <i class="fas fa-chart-line" style="font-size: 48px; margin-bottom: 15px; color: #2e7d32;"></i>
+                            <p>Revenue chart would appear here</p>
+                            <small>Monthly revenue: $12,580 (June 2023)</small>
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-icon revenue-icon">
-                    <i class="fas fa-dollar-sign"></i>
+                
+                <div class="recent-orders">
+                    <div class="section-header">
+                        <h3>Recent Orders</h3>
+                        <a href="#" class="view-all">View All</a>
+                    </div>
+                    
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="order-id">#CT-7842</td>
+                                <td class="customer-name">John Smith</td>
+                                <td class="order-date">Jun 12, 2023</td>
+                                <td><span class="order-status status-confirmed">Confirmed</span></td>
+                            </tr>
+                            <tr>
+                                <td class="order-id">#CT-7841</td>
+                                <td class="customer-name">Sarah Johnson</td>
+                                <td class="order-date">Jun 11, 2023</td>
+                                <td><span class="order-status status-preparing">Preparing</span></td>
+                            </tr>
+                            <tr>
+                                <td class="order-id">#CT-7840</td>
+                                <td class="customer-name">Michael Chen</td>
+                                <td class="order-date">Jun 11, 2023</td>
+                                <td><span class="order-status status-pending">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td class="order-id">#CT-7839</td>
+                                <td class="customer-name">Emily Wilson</td>
+                                <td class="order-date">Jun 10, 2023</td>
+                                <td><span class="order-status status-confirmed">Confirmed</span></td>
+                            </tr>
+                            <tr>
+                                <td class="order-id">#CT-7838</td>
+                                <td class="customer-name">Robert Garcia</td>
+                                <td class="order-date">Jun 10, 2023</td>
+                                <td><span class="order-status status-preparing">Preparing</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
             
-            <div class="stat-card">
-                <div class="stat-info">
-                    <h3 id="active-customers">89</h3>
-                    <p>Active Customers</p>
-                </div>
-                <div class="stat-icon customers-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-info">
-                    <h3 id="pending-orders">8</h3>
-                    <p>Pending Orders</p>
-                </div>
-                <div class="stat-icon pending-icon">
-                    <i class="fas fa-clock"></i>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Charts and Recent Orders -->
-        <div class="dashboard-content">
-            <div class="chart-container">
+            <!-- Upcoming Events -->
+            <div class="chart-container upcoming-events">
                 <div class="section-header">
-                    <h3>Revenue Overview</h3>
-                    <a href="#" class="view-all">View Details</a>
-                </div>
-                <div class="chart-placeholder">
-                    <div style="text-align: center;">
-                        <i class="fas fa-chart-line" style="font-size: 48px; margin-bottom: 15px; color: #2e7d32;"></i>
-                        <p>Revenue chart would appear here</p>
-                        <small>Monthly revenue: $12,580 (June 2023)</small>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="recent-orders">
-                <div class="section-header">
-                    <h3>Recent Orders</h3>
-                    <a href="#" class="view-all">View All</a>
+                    <h3>Upcoming Catering Events</h3>
+                    <a href="#" class="view-all">View Calendar</a>
                 </div>
                 
-                <table class="orders-table">
-                    <thead>
-                        <tr>
-                            <th>Order ID</th>
-                            <th>Customer</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="order-id">#CT-7842</td>
-                            <td class="customer-name">John Smith</td>
-                            <td class="order-date">Jun 12, 2023</td>
-                            <td><span class="order-status status-confirmed">Confirmed</span></td>
-                        </tr>
-                        <tr>
-                            <td class="order-id">#CT-7841</td>
-                            <td class="customer-name">Sarah Johnson</td>
-                            <td class="order-date">Jun 11, 2023</td>
-                            <td><span class="order-status status-preparing">Preparing</span></td>
-                        </tr>
-                        <tr>
-                            <td class="order-id">#CT-7840</td>
-                            <td class="customer-name">Michael Chen</td>
-                            <td class="order-date">Jun 11, 2023</td>
-                            <td><span class="order-status status-pending">Pending</span></td>
-                        </tr>
-                        <tr>
-                            <td class="order-id">#CT-7839</td>
-                            <td class="customer-name">Emily Wilson</td>
-                            <td class="order-date">Jun 10, 2023</td>
-                            <td><span class="order-status status-confirmed">Confirmed</span></td>
-                        </tr>
-                        <tr>
-                            <td class="order-id">#CT-7838</td>
-                            <td class="customer-name">Robert Garcia</td>
-                            <td class="order-date">Jun 10, 2023</td>
-                            <td><span class="order-status status-preparing">Preparing</span></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="event-list">
+                    <div class="event-item">
+                        <div class="event-details">
+                            <h4>Corporate Lunch - Tech Solutions Inc.</h4>
+                            <p>120 attendees • Office Building, Downtown</p>
+                        </div>
+                        <div class="event-time">Tomorrow, 12:00 PM</div>
+                    </div>
+                    
+                    <div class="event-item">
+                        <div class="event-details">
+                            <h4>Wedding Reception - Miller & Johnson</h4>
+                            <p>250 attendees • Grand Hotel Ballroom</p>
+                        </div>
+                        <div class="event-time">Jun 15, 2023 • 6:00 PM</div>
+                    </div>
+                    
+                    <div class="event-item">
+                        <div class="event-details">
+                            <h4>Charity Gala - Hope Foundation</h4>
+                            <p>300 attendees • Convention Center</p>
+                        </div>
+                        <div class="event-time">Jun 18, 2023 • 7:00 PM</div>
+                    </div>
+                </div>
             </div>
         </div>
         
-        <!-- Upcoming Events -->
-        <div class="chart-container upcoming-events">
-            <div class="section-header">
-                <h3>Upcoming Catering Events</h3>
-                <a href="#" class="view-all">View Calendar</a>
-            </div>
-            
-            <div class="event-list">
-                <div class="event-item">
-                    <div class="event-details">
-                        <h4>Corporate Lunch - Tech Solutions Inc.</h4>
-                        <p>120 attendees • Office Building, Downtown</p>
-                    </div>
-                    <div class="event-time">Tomorrow, 12:00 PM</div>
-                </div>
-                
-                <div class="event-item">
-                    <div class="event-details">
-                        <h4>Wedding Reception - Miller & Johnson</h4>
-                        <p>250 attendees • Grand Hotel Ballroom</p>
-                    </div>
-                    <div class="event-time">Jun 15, 2023 • 6:00 PM</div>
-                </div>
-                
-                <div class="event-item">
-                    <div class="event-details">
-                        <h4>Charity Gala - Hope Foundation</h4>
-                        <p>300 attendees • Convention Center</p>
-                    </div>
-                    <div class="event-time">Jun 18, 2023 • 7:00 PM</div>
-                </div>
-            </div>
-        </div>
+        <!-- Menu Manager Container (Hidden by default) -->
+        <div id="menuManagerContainer"></div>
+    </div>
+    
+    <!-- Loading Indicator -->
+    <div class="loading-indicator" id="loadingIndicator">
+        <div class="loading-spinner"></div>
+        <p>Loading Menu Manager...</p>
     </div>
     
     <!-- Under Development Message -->
@@ -981,38 +1040,125 @@
             const navItems = document.querySelectorAll('.nav-item');
             const devMessage = document.getElementById('devMessage');
             const closeDevMessage = document.getElementById('closeDevMessage');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const dashboardContent = document.getElementById('dashboardContent');
+            const menuManagerContainer = document.getElementById('menuManagerContainer');
+            const menuItemsLink = document.getElementById('menuItemsLink');
+            const goToDashboard = document.getElementById('goToDashboard');
             
-            navItems.forEach(item => {
-                item.addEventListener('click', function(e) {
-                    e.preventDefault();
+            // Function to show dashboard
+            function showDashboard() {
+                dashboardContent.style.display = 'block';
+                menuManagerContainer.style.display = 'none';
+                document.querySelector('.dashboard-title h2').textContent = 'Catering Dashboard';
+                
+                // Update active nav item
+                navItems.forEach(i => i.classList.remove('active'));
+                document.querySelector('.nav-item[data-page="dashboard"]').classList.add('active');
+            }
+            
+            // Function to load Menu Manager
+            async function loadMenuManager() {
+                try {
+                    // Show loading indicator
+                    loadingIndicator.style.display = 'flex';
                     
-                    // Don't show message for dashboard (current page)
-                    if (this.classList.contains('active')) {
-                        return;
+                    // Fetch the menu manager HTML file
+                    const response = await fetch('Menumanager.html');
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     
-                    // Show development message
-                    devMessage.style.display = 'flex';
+                    const html = await response.text();
+                    
+                    // Hide dashboard, show menu manager container
+                    dashboardContent.style.display = 'none';
+                    menuManagerContainer.style.display = 'block';
+                    menuManagerContainer.innerHTML = html;
+                    
+                    // Update header title
+                    document.querySelector('.dashboard-title h2').textContent = 'Menu Manager';
                     
                     // Update active nav item
                     navItems.forEach(i => i.classList.remove('active'));
-                    this.classList.add('active');
+                    menuItemsLink.classList.add('active');
                     
-                    // Update header title
-                    const pageName = this.getAttribute('data-page');
-                    const header = document.querySelector('.dashboard-title h2');
+                    // Re-initialize any scripts that might be in the loaded HTML
+                    // Note: External scripts in the loaded HTML won't run automatically
+                    // We need to extract and execute them manually
+                    const scripts = menuManagerContainer.querySelectorAll('script');
+                    scripts.forEach(script => {
+                        if (script.src) {
+                            // For external scripts, create new script element
+                            const newScript = document.createElement('script');
+                            newScript.src = script.src;
+                            document.head.appendChild(newScript);
+                        } else {
+                            // For inline scripts, evaluate them
+                            try {
+                                eval(script.textContent);
+                            } catch (e) {
+                                console.error('Error executing script:', e);
+                            }
+                        }
+                    });
                     
-                    const pageTitles = {
-                        'dashboard': 'Catering Dashboard',
-                        'bookings': 'Bookings Management',
-                        'menu': 'Menu Items',
-                        'customers': 'Customer Management',
-                        'analytics': 'Business Analytics',
-                        'settings': 'Settings'
-                    };
-                    
-                    header.textContent = pageTitles[pageName] || 'Caterix Dashboard';
-                });
+                } catch (error) {
+                    console.error('Error loading menu manager:', error);
+                    alert('Error loading Menu Manager. Please make sure Menumanager.html exists in the same directory.');
+                    showDashboard(); // Fall back to dashboard
+                } finally {
+                    // Hide loading indicator
+                    loadingIndicator.style.display = 'none';
+                }
+            }
+            
+            // Menu Items link click handler
+            menuItemsLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                loadMenuManager();
+            });
+            
+            // Logo click handler to go back to dashboard
+            goToDashboard.addEventListener('click', function(e) {
+                e.preventDefault();
+                showDashboard();
+            });
+            
+            // Other navigation items (except menu) show development message
+            navItems.forEach(item => {
+                if (item !== menuItemsLink) {
+                    item.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        // Don't show message for dashboard (current page)
+                        if (this.classList.contains('active')) {
+                            return;
+                        }
+                        
+                        // Show development message
+                        devMessage.style.display = 'flex';
+                        
+                        // Update active nav item
+                        navItems.forEach(i => i.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Update header title
+                        const pageName = this.getAttribute('data-page');
+                        const header = document.querySelector('.dashboard-title h2');
+                        
+                        const pageTitles = {
+                            'dashboard': 'Catering Dashboard',
+                            'bookings': 'Bookings Management',
+                            'customers': 'Customer Management',
+                            'analytics': 'Business Analytics',
+                            'settings': 'Settings'
+                        };
+                        
+                        header.textContent = pageTitles[pageName] || 'Caterix Dashboard';
+                    });
+                }
             });
             
             // Close development message
