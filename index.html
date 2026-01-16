@@ -1084,29 +1084,9 @@
                     navItems.forEach(i => i.classList.remove('active'));
                     menuItemsLink.classList.add('active');
                     
-                    // Re-initialize any scripts that might be in the loaded HTML
-                    // Note: External scripts in the loaded HTML won't run automatically
-                    // We need to extract and execute them manually
-                    const scripts = menuManagerContainer.querySelectorAll('script');
-                    scripts.forEach(script => {
-                        if (script.src) {
-                            // For external scripts, create new script element
-                            const newScript = document.createElement('script');
-                            newScript.src = script.src;
-                            document.head.appendChild(newScript);
-                        } else {
-                            // For inline scripts, evaluate them
-                            try {
-                                eval(script.textContent);
-                            } catch (e) {
-                                console.error('Error executing script:', e);
-                            }
-                        }
-                    });
-                    
                 } catch (error) {
                     console.error('Error loading menu manager:', error);
-                    alert('Error loading Menu Manager. Please make sure Menumanager.html exists in the same directory.');
+                    alert('Error loading Menu Manager. Please make sure Menumanager.html exists in the same directory.\n\nError details: ' + error.message);
                     showDashboard(); // Fall back to dashboard
                 } finally {
                     // Hide loading indicator
@@ -1114,9 +1094,10 @@
                 }
             }
             
-            // Menu Items link click handler
+            // Menu Items link click handler - FIXED
             menuItemsLink.addEventListener('click', function(e) {
                 e.preventDefault();
+                e.stopPropagation();
                 loadMenuManager();
             });
             
@@ -1128,11 +1109,12 @@
             
             // Other navigation items (except menu) show development message
             navItems.forEach(item => {
-                if (item !== menuItemsLink) {
+                // Skip the menu items link and dashboard link
+                if (item !== menuItemsLink && item.getAttribute('data-page') !== 'dashboard') {
                     item.addEventListener('click', function(e) {
                         e.preventDefault();
                         
-                        // Don't show message for dashboard (current page)
+                        // Don't show message if already active
                         if (this.classList.contains('active')) {
                             return;
                         }
@@ -1149,7 +1131,6 @@
                         const header = document.querySelector('.dashboard-title h2');
                         
                         const pageTitles = {
-                            'dashboard': 'Catering Dashboard',
                             'bookings': 'Bookings Management',
                             'customers': 'Customer Management',
                             'analytics': 'Business Analytics',
@@ -1157,6 +1138,14 @@
                         };
                         
                         header.textContent = pageTitles[pageName] || 'Caterix Dashboard';
+                    });
+                }
+                
+                // Dashboard link
+                if (item.getAttribute('data-page') === 'dashboard' && item !== menuItemsLink) {
+                    item.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        showDashboard();
                     });
                 }
             });
